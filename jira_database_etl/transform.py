@@ -1,5 +1,5 @@
 import json
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from datetime import datetime
 from collections import defaultdict
 
@@ -30,8 +30,9 @@ class TransformData:
         body['key'] = issue.get('key')
         body['summary'] = str(issue['fields'].get('summary'))
         body['status'] = issue['fields'].get('status', {}).get('name', {})
-        body['priority_rank'] = issue['fields'].get('priority', {}).get('id', {})
-        body['priority_name'] = issue['fields'].get('priority', {}).get('name', {})
+        body['priority_rank'] = (issue['fields'].get('priority') or {}).get('id')
+
+        body['priority_name'] = (issue['fields'].get('priority') or {}).get('name')
         body['issuetype'] = issue['fields'].get('issuetype', {}).get('name', {})
         body['project'] = issue['fields'].get('project', {}).get('name', {})
         body['epic_link'] = issue['fields'].get('customfield_10008', None)
@@ -46,8 +47,9 @@ class TransformData:
             body['created'] = int(datetime.timestamp(datetime.strptime(created_date, "%Y-%m-%dT%H:%M:%S.%f%z")))
         if issue['fields'].get('assignee', {}):
             body['assignee_name'] = issue['fields'].get('assignee', {}).get('displayName', {})
-        if issue['fields'].get('customfield_10005', {}):
-            body['epic_name'] = issue['fields'].get('customfield_10005', None)
+        # Asigna epic_name, usando customfield_10005 si existe, si no, usa summary
+        body['epic_name'] = issue['fields'].get('customfield_10005') or ""
+
         if issue['fields'].get('customfield_10007', None):
             body.update(self.parse_sprint_data(issue['fields']['customfield_10007']))
         if issue['fields'].get('labels', None):

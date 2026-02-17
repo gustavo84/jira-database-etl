@@ -30,9 +30,21 @@ class Database:
         return result
 
     def __truncate_table(self, table):
-        """Clear existing SQL table."""
-        sql = text(f'TRUNCATE TABLE {table}')
-        self.engine.execute(sql)
+        """Truncate table if it exists."""
+        sql = f"""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT FROM pg_tables WHERE schemaname='public' AND tablename='{table.lower()}') THEN
+                EXECUTE 'TRUNCATE TABLE {table.lower()} RESTART IDENTITY CASCADE';
+            END IF;
+        END
+        $$;
+        """
+        with self.engine.begin() as conn:
+            conn.exec_driver_sql(sql)
+
+
+
 
     def __merge_epic_metadata(self, jira_issues_df):
         """Merge epic metadata from existing SQL table."""
