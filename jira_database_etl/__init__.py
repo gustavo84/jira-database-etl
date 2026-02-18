@@ -43,8 +43,7 @@ class FetchJiraIssues:
     def get_issues(self):
         return self.__fetch_all_results(self.jira_issues_jql)
 
-    def get_epics(self):
-        return self.__fetch_all_results(self.jira_epics_jql)
+
 
     def __fetch_all_results(self, jql):
         # 1) Fetch keys only
@@ -87,6 +86,7 @@ class FetchJiraIssues:
 
             if r.status_code == 200:
                 issue_arr.append(r.json())
+                logger.info(f"Found {r.json()} issues")
             else:
                 logger.warning(f"Failed {key}: {r.status_code}")
 
@@ -113,7 +113,7 @@ class TransformData:
         body["issuetype"] = f.get("issuetype", {}).get("name")
         body["priority"] = (f.get("priority") or {}).get("name")
         body["assignee"] = (f.get("assignee") or {}).get("displayName")
-
+        body["description"] =(issue.get("renderedFields") or {}).get("description")
         body["created"] = f.get("created")
         body["updated"] = f.get("updated")
 
@@ -238,7 +238,7 @@ def init_script():
     logger.info("Fetching JIRA data")
     jira = FetchJiraIssues(Config)
     issues = jira.get_issues()
-    epics = jira.get_epics()
+
 
     logger.info("Transforming core table")
     t = TransformData()
