@@ -1,3 +1,4 @@
+Extracts issues from a JIRA instance via the JIRA REST API, transforms the data, and loads data to a database.
 # JIRA-to-Database Import
 
 ##isntalar poetry
@@ -14,4 +15,3 @@ poetry run python main.py
 ![alt text](image-1.png)
 ![alt text](image-2.png)
 ![alt text](image-3.png)
-
