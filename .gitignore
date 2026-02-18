@@ -82,7 +82,7 @@ target/
 
 # celery beat schedule file
 celerybeat-schedule
-
+.myenv
 # SageMath parsed files
 *.sage.py
 
