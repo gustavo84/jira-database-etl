@@ -118,8 +118,7 @@ logs/errors.log
 
 
 
-.env
-.env.swp
+
 datafiles/*
 models.py
 __pycache__
